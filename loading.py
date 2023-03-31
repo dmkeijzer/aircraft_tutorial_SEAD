@@ -47,8 +47,14 @@ def cg_calculation(MTOW, x_lemac):
     cg_wgroup_lemac = cg_wgroup - x_lemac
     cg_fusgroup_lemac = cg_fusgroup - x_lemac
     cg_OEW_lemac = cg_OEW - x_lemac
-    print("The center of gravity of fuselage group, wing group, and OEW measured from the nose is: ", cg_fusgroup,
+    print("The center of gravity of fuselage group, wing group, and OEW measured from the lemac is: ", cg_fusgroup,
           cg_wgroup, cg_OEW)
+
+    cg_perc_w = cg_wgroup_lemac/c_mac
+    cg_perc_f = cg_fusgroup_lemac/c_mac
+    cg_perc_OEW = cg_OEW_lemac/c_mac
+    print("The center of gravity of fuselage group, wing group, and OEW measured from the lemac as percentage of mac is: ", cg_perc_w,
+          cg_perc_f, cg_perc_OEW)
 
 cg_calculation(MTOW, x_lemac)
 
