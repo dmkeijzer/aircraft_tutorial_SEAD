@@ -8,6 +8,7 @@ Mfuel = 5000 # kg - max fuel mass before modfications
 
 #------------ performance -------------------------------------------
 
+shaft_power = 2022.6217*1e3 # watts - shaft power 
 climb_speed = 170 # KCAS
 max_cruise_speed = 500/3.6 # m/s 
 fuel_consumption = 650/3600 # kg/s 
