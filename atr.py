@@ -1,6 +1,8 @@
 from math import *
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.constants import g
+from const import *
 
 cr = 2.57
 ct = 1.59
@@ -13,7 +15,6 @@ sweep = 0
 
 taper = ct/cr
 y_lemac = (b_half/6) * ((1 + 2*taper)/taper)
-print(y_lemac)
 x_lemac = 11.60
 
 def cg_calculation(MTOW, x_lemac):
@@ -70,6 +71,7 @@ def cg_calculation(MTOW, x_lemac):
 
     return cg_OEW, cg_OEW_lemac, OEW, PW
 
+
 def convert_lemac(xcg):
     return (xcg - x_lemac)/c_mac
 vec_convert_lemac = np.vectorize(convert_lemac)
@@ -80,7 +82,6 @@ def loading_diagrams(OEW, PW):
 
     front_cargo = 2.5922 # meter
     back_cargo = 21.912 # meter
-
     cargo_dist = [front_cargo, back_cargo]
 
     max_cargo = PW - 72*80 # kg
@@ -157,8 +158,6 @@ def loading_diagrams(OEW, PW):
 
     #--------------------------- Plotting ---------------------------------------------------
 
-    
-
     # plotting cargo
     plt.plot(vec_convert_lemac(cg_cargo_pot_fb), fb_weight_cargo, ".-", markersize= 12, label= "Cargo front to back")
     plt.plot(vec_convert_lemac(cg_cargo_pot_bf), bf_weight_cargo, ".-",markersize= 12,label = "Cargo back to front")
@@ -185,5 +184,40 @@ def loading_diagrams(OEW, PW):
     plt.legend(prop={'size': 8})
     plt.show()
 
-cg_oew, cg_oew_lemac, OEW, PW= cg_calculation(MTOW, x_lemac)
-loading_diagrams(OEW, PW)
+def scissor_plot(SM):
+    """
+    :param SM: stability margin
+    :type SM: float
+    """    
+    xcg_bar = np.linspace(-1,1, 1000)
+
+    #stability line creation
+    sh_s_stab = 1/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)*xcg_bar - (xac_bar - SM)/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)
+
+    # contralliblity line creation
+    sh_s_contr = 1/(CL_h_max/CL_tailles_max*lh_c*vh_v**2)*xcg_bar + (cm_ac/CL_a_tailles - xac_bar)/(CL_ah/CL_a_tailles*lh_c*vh_v**2)
+
+    pass
+
+
+    # Plotting the actual scissor plot
+    plt.plot(xcg_bar, sh_s_stab, color= "k", lw= 2, label="Stability line")
+    plt.plot(xcg_bar, sh_s_contr, "-.", color= "k", lw= 2, label="Controllability line ")
+
+    plt.fill_between(xcg_bar, sh_s_stab, color= 'red', alpha= 0.4)
+    plt.fill_between(xcg_bar, sh_s_contr, color= 'red', alpha= 0.4)
+
+
+    plt.ylim([0, max(np.max(sh_s_stab), np.max(sh_s_contr))])
+    plt.ylabel(r"$\frac{S_h}{S}$ [-]", fontsize= 16)
+    plt.xlabel(r"$\frac{X_{cg}}{\overline{c}}$ [-]", fontsize= 16)
+    plt.legend()
+    plt.show()
+
+
+if __name__ == "__main__":
+
+    # cg_oew, cg_oew_lemac, OEW, PW= cg_calculation(MTOW, x_lemac)
+    # loading_diagrams(OEW, PW)
+    scissor_plot(0.05)
+
