@@ -46,7 +46,7 @@ taper = ct/cr
 y_lemac = (b_half/6) * ((1 + 2*taper)/taper)
 x_lemac = 11.60
 def convert_lemac(xcg):  return (xcg - x_lemac)/c_mac # just some useful function
-xac_bar = 0.25 
+xac_bar = 0.25
 #------------ centre of gravity -----------------
 
 cg_w = 12.35
@@ -63,11 +63,13 @@ def cl_a_datcom(A,HalfSweep, M=0.4):
         return (2*np.pi*A)/(2 + np.sqrt( 4 + (A*np.sqrt(1 - M**2)/0.95)**2*(1 + np.tan(HalfSweep)**2/(np.sqrt(1 - M**2)))))
 
 CL_tailles_max = w_s_max/(0.5*1.225*v_stall**2)
+# CL_tailles_max = 3.0
 CL_h_max = -0.35*A_h**(1/3)
-cm_ac = -0.1
-CL_ah = cl_a_datcom(A_h, 0, mach_at_cruise) # per radian - taken from svv for now
+# CL_h_max = -0.8
+cm_ac = -0.5
+CL_ah = cl_a_datcom(A_h, np.radians(6), mach_at_cruise) # per radian - taken from svv for now
 CL_a_tailles = cl_a_datcom(A, 0 , mach_at_cruise)   # for now taken from svv
 deda =  0.30 # assumed
 lh =   26.21   # Used method from adsee to compute centre of pressure and use this distance
 lh_c = lh/c_mac
-vh_v =  1 # Assume one due to T tail
+vh_v =  0.90 # Assume 0.9 is advantage of T-tail is neglibile due to high wing config 

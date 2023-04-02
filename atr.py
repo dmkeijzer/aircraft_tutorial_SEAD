@@ -186,11 +186,13 @@ def loading_diagrams(cg_OEW, OEW, PW, plot= True):
         plt.show()
     return max_cg, min_cg
 
-def scissor_plot(SM, max_cg, min_cg, plot=True):
+def scissor_plot(SM, max_cg, min_cg):
     """
     :param SM: stability margin
     :type SM: float
     """    
+    plt.clf()
+
     xcg_bar = np.linspace(-1,1, 1000)
     sh_s_range = np.linspace(0, 0.2, 1000)
 
@@ -200,44 +202,45 @@ def scissor_plot(SM, max_cg, min_cg, plot=True):
     sh_s_stab = a0*xcg_bar + b0
     x0 = (sh_s_range - b0)/a0
 
+    #neutral stability line creation
+    a = 1/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)
+    b = -(xac_bar)/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)
+    sh_s_NeutStab = a*xcg_bar + b
+
     # contralliblity line creation
     a1 = 1/(CL_h_max/CL_tailles_max*lh_c*vh_v**2)
-    b1 = (cm_ac/CL_a_tailles - xac_bar)/(CL_ah/CL_a_tailles*lh_c*vh_v**2)
+    b1 = (cm_ac/CL_tailles_max- xac_bar)/(CL_h_max/CL_tailles_max*lh_c*vh_v**2)
     sh_s_contr = a1*xcg_bar + b1
     x1 = (sh_s_range - b1)/a1
 
 
     # Plotting the actual scissor plot
     plt.plot(xcg_bar, sh_s_stab, color= "k", lw= 2, label="Stability line")
+    plt.plot(xcg_bar, sh_s_NeutStab, "-", color= "b", lw= 2, label="Neutral Stability line")
     plt.plot(xcg_bar, sh_s_contr, "-.", color= "k", lw= 2, label="Controllability line ")
 
-    plt.fill_between(xcg_bar, sh_s_stab, color= 'red', alpha= 0.4)
+    plt.fill_between(xcg_bar, sh_s_NeutStab, color= 'red', alpha= 0.4)
     plt.fill_between(xcg_bar, sh_s_contr, color= 'red', alpha= 0.4)
 
     # Fitting cg range in plot
-    width_scissor = x0 - x1
-    idx = np.isclose(width_scissor, max_cg - min_cg, atol= 1e-3 )
-    aft_lim = x0[idx]
-    front_lim = x1[idx]
-    if np.isclose(x0[idx]*a0 + b0, x1[idx]*a1 + b1):
-        sh_s = x0[idx]*a0 + b0
-
+    idx = np.isclose(x1, min_cg, atol=0.005)
+    sh_s = x1[idx]*a1 + b1
 
 
     plt.ylim([0, np.max([np.max(sh_s_stab), np.max(sh_s_contr)])])
-    plt.hlines(sh_s, front_lim, aft_lim, colors="fuchsia", lw = 2, label= "$S_h = $" + str(np.round(sh_s[0], 4)) + " Tail sized using loading diagram")
-    plt.hlines(0.8*sh_s, min_cg, max_cg, colors= "chartreuse", lw=2, label= "Actual shift from loading diagram")
+    # plt.hlines(sh_s, min_cg, max_cg, colors= "k", lw=4,alpha=0.8, label= "Actual shift from loading diagram")
+    plt.hlines(sh_s, min_cg , max_cg, colors="fuchsia", lw = 2, label= "$S_h = $" + str(np.round(sh_s[0], 4)) + " tail sizing." + "\n" +  r"Actual $\frac{S_h}{S} = $" + str(np.round(s_h/s,4)) )
+    plt.vlines([min_cg, max_cg], 0,np.max([np.max(sh_s_stab), np.max(sh_s_contr)]), label= "Min and max CG", lw= 2, colors="darkorange" )
     plt.ylabel(r"$\frac{S_h}{S}$ [-]", fontsize= 16)
     plt.xlabel(r"$\frac{X_{cg}}{\overline{c}}$ [-]", fontsize= 16)
     plt.legend()
-    if plot:
-        plt.show()
+    plt.show()
 
 
 if __name__ == "__main__":
 
     cg_oew, cg_oew_lemac, OEW, PW= cg_calculation(MTOW, x_lemac)
-    max, min = loading_diagrams(cg_oew, OEW, PW, plot=False)
+    max, min = loading_diagrams(cg_oew, OEW, PW)
     scissor_plot(0.05, max, min )
     plt.show()
 
