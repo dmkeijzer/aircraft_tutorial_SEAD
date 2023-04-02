@@ -16,7 +16,9 @@ v_stall = 112*0.5144 # approach speed http://www.independance.pl/atr-speeds.html
 w_s_max = 373.8*g # n/m^2
 shaft_power = 2022.6217*1e3 # watts - shaft power 
 climb_speed = 170 # KCAS
-max_cruise_speed = 500/3.6 # m/s 
+cruise_speed = 509/3.6 # m/s - 509 at FL170
+fl_cruise = 17000*0.3048 # m
+mach_at_cruise = cruise_speed/np.sqrt(1.4*287*254.470) # temperature at FL170 from https://www.digitaldutch.com/atmoscalc/
 fuel_consumption = 650/3600 # kg/s 
 one_engine_out_ceiling = 2990 # m / 9800 # ft
 max_range_MaxPax = 1370 # km
@@ -33,6 +35,7 @@ s = 61
 s_h = 11.73
 b_h = 7.42
 A_h = b_h**2/s_h
+A = 12
 cr = 2.57
 ct = 1.59
 c_mac = 2.11847
@@ -56,12 +59,15 @@ cg_ln = 1.64
 
 #----------------------- Aerodynamics ----------------
 
+def cl_a_datcom(A,HalfSweep, M=0.4):
+        return (2*np.pi*A)/(2 + np.sqrt( 4 + (A*np.sqrt(1 - M**2)/0.95)**2*(1 + np.tan(HalfSweep)**2/(np.sqrt(1 - M**2)))))
+
 CL_tailles_max = w_s_max/(0.5*1.225*v_stall**2)
 CL_h_max = -0.35*A_h**(1/3)
 cm_ac = -0.1
-CL_ah = 4.627379968808672 # per radian - taken from svv for now
-CL_a_tailles = 4.826827278421984   # for now taken from svv
+CL_ah = cl_a_datcom(A_h, 0, mach_at_cruise) # per radian - taken from svv for now
+CL_a_tailles = cl_a_datcom(A, 0 , mach_at_cruise)   # for now taken from svv
 deda =  0.30 # assumed
 lh =   26.21   # Used method from adsee to compute centre of pressure and use this distance
 lh_c = lh/c_mac
-vh_v =  0.9
+vh_v =  1 # Assume one due to T tail

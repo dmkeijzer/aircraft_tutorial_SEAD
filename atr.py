@@ -77,7 +77,7 @@ def convert_lemac(xcg):
 vec_convert_lemac = np.vectorize(convert_lemac)
 
 
-def loading_diagrams(OEW, PW):
+def loading_diagrams(cg_OEW, OEW, PW, plot= True):
     seat_pitch = np.arange(6, 18.963, 29*0.0254)
 
     front_cargo = 2.5922 # meter
@@ -182,22 +182,29 @@ def loading_diagrams(OEW, PW):
     plt.xlabel('cg location measured from LEMAC as a percentage of MAC')
     plt.ylabel('Weight in [kg]')
     plt.legend(prop={'size': 8})
-    plt.show()
+    if plot:
+        plt.show()
+    return max_cg, min_cg
 
-def scissor_plot(SM):
+def scissor_plot(SM, max_cg, min_cg, plot=True):
     """
     :param SM: stability margin
     :type SM: float
     """    
     xcg_bar = np.linspace(-1,1, 1000)
+    sh_s_range = np.linspace(0, 0.2, 1000)
 
     #stability line creation
-    sh_s_stab = 1/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)*xcg_bar - (xac_bar - SM)/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)
+    a0 = 1/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)
+    b0 = -(xac_bar - SM)/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)
+    sh_s_stab = a0*xcg_bar + b0
+    x0 = (sh_s_range - b0)/a0
 
     # contralliblity line creation
-    sh_s_contr = 1/(CL_h_max/CL_tailles_max*lh_c*vh_v**2)*xcg_bar + (cm_ac/CL_a_tailles - xac_bar)/(CL_ah/CL_a_tailles*lh_c*vh_v**2)
-
-    pass
+    a1 = 1/(CL_h_max/CL_tailles_max*lh_c*vh_v**2)
+    b1 = (cm_ac/CL_a_tailles - xac_bar)/(CL_ah/CL_a_tailles*lh_c*vh_v**2)
+    sh_s_contr = a1*xcg_bar + b1
+    x1 = (sh_s_range - b1)/a1
 
 
     # Plotting the actual scissor plot
@@ -207,17 +214,30 @@ def scissor_plot(SM):
     plt.fill_between(xcg_bar, sh_s_stab, color= 'red', alpha= 0.4)
     plt.fill_between(xcg_bar, sh_s_contr, color= 'red', alpha= 0.4)
 
+    # Fitting cg range in plot
+    width_scissor = x0 - x1
+    idx = np.isclose(width_scissor, max_cg - min_cg, atol= 1e-3 )
+    aft_lim = x0[idx]
+    front_lim = x1[idx]
+    if np.isclose(x0[idx]*a0 + b0, x1[idx]*a1 + b1):
+        sh_s = x0[idx]*a0 + b0
 
-    plt.ylim([0, max(np.max(sh_s_stab), np.max(sh_s_contr))])
+
+
+    plt.ylim([0, np.max([np.max(sh_s_stab), np.max(sh_s_contr)])])
+    plt.hlines(sh_s, front_lim, aft_lim, colors="fuchsia", lw = 2, label= "$S_h = $" + str(np.round(sh_s[0], 4)) + " Tail sized using loading diagram")
+    plt.hlines(0.8*sh_s, min_cg, max_cg, colors= "chartreuse", lw=2, label= "Actual shift from loading diagram")
     plt.ylabel(r"$\frac{S_h}{S}$ [-]", fontsize= 16)
     plt.xlabel(r"$\frac{X_{cg}}{\overline{c}}$ [-]", fontsize= 16)
     plt.legend()
-    plt.show()
+    if plot:
+        plt.show()
 
 
 if __name__ == "__main__":
 
-    # cg_oew, cg_oew_lemac, OEW, PW= cg_calculation(MTOW, x_lemac)
-    # loading_diagrams(OEW, PW)
-    scissor_plot(0.05)
+    cg_oew, cg_oew_lemac, OEW, PW= cg_calculation(MTOW, x_lemac)
+    max, min = loading_diagrams(cg_oew, OEW, PW, plot=False)
+    scissor_plot(0.05, max, min )
+    plt.show()
 
