@@ -1,16 +1,19 @@
 
-from atr import *
+from atr import vec_convert_lemac
+import matplotlib.pyplot as plt
 from const_mod import *
 
-def cg_modification(MTOW):
+MTOW = 23000
 
-    W_w = 0.149 * MTOW*0.80738 # wing computed using assumptions that all weight decrease of wing group is due to the wing
-    W_wh = 0.018 * MTOW # wing horizontal
-    W_wv = 0.02 * MTOW # wing vertical
-    W_en = 0.103 * MTOW # engine
-    W_fus = 0.248 * MTOW*1.02 # fuselage weight
-    W_lm = 0.035 * MTOW # main landing gear
-    W_ln = 0.005 * MTOW # nose landing gear
+def cg_modification(mtow):
+
+    W_w = 0.149 * mtow*0.80738 # wing computed using assumptions that all weight decrease of wing group is due to the wing
+    W_wh = 0.018 * mtow # wing horizontal
+    W_wv = 0.02 * mtow # wing vertical
+    W_en = 0.103 * mtow # engine
+    W_fus = 0.248 * mtow*1.02 # fuselage weight
+    W_lm = 0.035 * mtow # main landing gear
+    W_ln = 0.005 * mtow # nose landing gear
 
     W_fusgroup = (W_fus + W_wh + W_wv + W_ln)
     W_wgroup = (W_w  + W_en + W_lm)
@@ -207,6 +210,6 @@ def scissor_plot_mod(SM, max_cg, min_cg):
 
 
 if __name__ == "__main__":
-    cg_oew, cg_oew_lemac, OEW, PW=cg_modification(23000)
+    cg_oew, cg_oew_lemac, OEW, PW=cg_modification(MTOW)
     max, min = loading_diagrams_mod(cg_oew, OEW, PW, plot=True)
     scissor_plot_mod(0.05, max, min )

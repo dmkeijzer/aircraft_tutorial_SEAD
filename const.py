@@ -72,4 +72,4 @@ CL_a_tailles = cl_a_datcom(A, 0 , mach_at_cruise)   # for now taken from svv
 deda =  0.30 # assumed
 lh =   26.21   # Used method from adsee to compute centre of pressure and use this distance
 lh_c = lh/c_mac
-vh_v =  0.90 # Assume 0.9 is advantage of T-tail is neglibile due to high wing config 
+vh_v =   1 # Assume 0.9 is advantage of T-tail is neglibile due to high wing config 
