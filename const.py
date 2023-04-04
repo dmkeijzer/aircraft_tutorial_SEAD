@@ -34,7 +34,7 @@ l_n = 2.63
 
 
 # fuselage
-l_tot = 27.165
+l_f = 27.165
 
 # misc
 lh = 14.00
@@ -61,7 +61,7 @@ shaft_power = 2750 # horsepower - shaft power
 climb_speed = 170 # KCAS
 cruise_speed = 509/3.6 # m/s - 509 at FL170
 alt_cruise = 17000*0.3048 # m
-rho_cr = 0.721759 #kg/m^3
+rho_cr = 0.721759 #kg/m^3 density at FL170 from https://www.digitaldutch.com/atmoscalc/
 t_cr = 254.470 #k
 mach_at_cruise = cruise_speed/np.sqrt(1.4*287*t_cr) # temperature at FL170 from https://www.digitaldutch.com/atmoscalc/
 cl_cr = (2*Mtwo*g)/(rho_cr*cruise_speed**2*s)
@@ -82,7 +82,7 @@ cg_w = 12.35
 cg_wh = 26.47
 cg_wv = 24.15
 cg_en = 11.32
-cg_fus = 0.39 * l_tot
+cg_fus = 0.39 * l_f
 cg_lm = 12.69
 cg_ln = 1.64
 
@@ -115,7 +115,7 @@ CL_h_max = -0.35*A_h**(1/3)
 cm_ac_airfoil = -0.2 # assummed
 cm_ac_w = cm_ac_airfoil*(A/(A + 2))
 cm_ac_flaps  = - 0.2 # TODO do it the correct way
-cm_ac_fus = -1.8*(1 - (2.5*b_f)/l_tot)*((np.pi*b_f*h_f*l_tot)/(4*s*c_mac))*(CL0/cl_a_tailles(A, 0,  v_stall/np.sqrt(1.4*287*288.15)))
+cm_ac_fus = -1.8*(1 - (2.5*b_f)/l_f)*((np.pi*b_f*h_f*l_f)/(4*s*c_mac))*(CL0/cl_a_tailles(A, 0,  v_stall/np.sqrt(1.4*287*288.15)))
 cm_ac = cm_ac_w + cm_ac_fus + cm_ac_flaps
 
 

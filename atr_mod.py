@@ -24,7 +24,7 @@ def cg_modification(mtow):
     cg_wh = 26.47
     cg_wv = 24.15
     cg_en = 11.32
-    cg_fus = 0.39 * l_tot
+    cg_fus = 0.39 * l_f
     cg_lm = 12.69
     cg_ln = 1.64
 
@@ -195,22 +195,33 @@ def scissor_plot_mod(SM, max_cg, min_cg):
     # Fitting cg range in plot
     idx1 = np.isclose(x1, min_cg, atol=0.01)
     idx0 = np.isclose(x0, max_cg, atol=0.01)
+    width = x0 - x1
     if all(np.logical_not(idx1)) or all(np.logical_not(idx0)):
         solution = False
     else:
         solution = True
-        sh_s = np.max([np.max(x1[idx1]*a1 + b1),np.max(x0[idx0]*a0 + b0)])
+        idx_width = np.isclose(width, max_cg - min_cg, atol=0.001)
+        aft_lim = np.min(x0[idx_width])
+        front_lim = np.max(x1[idx_width])
+        ideal_sh_s = np.max([np.max(x1[idx_width]*a1 + b1),np.min(x0[idx_width]*a0 + b0)])
+        act_sh_s = np.max([np.max(x1[idx1]*a1 + b1),np.min(x0[idx0]*a0 + b0)])
+        shift_wing = aft_lim - max_cg
+        if not np.isclose(shift_wing, front_lim - min_cg, atol= 0.01):
+            solution = False
+            raise Exception("Something is wrong with the shift")
 
 
 
     plt.ylim([0, np.max([np.max(sh_s_stab), np.max(sh_s_contr)])])
     # plt.hlines(sh_s, min_cg, max_cg, colors= "k", lw=4,alpha=0.8, label= "Actual shift from loading diagram")
     if solution:
-        plt.hlines(sh_s, min_cg , max_cg, colors="fuchsia", lw = 2, label= "$S_h = $" + str(np.round(sh_s, 4)) + " tail sizing." + "\n" +  r"Actual $\frac{S_h}{S} = $" + str(np.round(s_h/s,4)) )
-    plt.vlines([min_cg, max_cg], 0,np.max([np.max(sh_s_stab), np.max(sh_s_contr)]), label= "Min and max CG", lw= 2, colors="darkorange" )
+        plt.hlines(ideal_sh_s, front_lim ,aft_lim, colors="fuchsia", lw = 2, label= "$S_h = $" + str(np.round(ideal_sh_s, 4)) + " Ideal tail sizing." + "\n" +  "Estimate of Wing shift = " + str(np.round(shift_wing,1)) + "[-]" )
+        plt.hlines(act_sh_s, min_cg , max_cg, colors="cyan", lw = 2, label= "$S_h = $" + str(np.round(act_sh_s, 4)) + " original cg tail sizing")
+    plt.vlines([min_cg, max_cg], 0,np.max([np.max(sh_s_stab), np.max(sh_s_contr)]), label= "Loading diagram Min and max CG", lw= 2, colors="darkorange" )
+    plt.vlines([front_lim, aft_lim], 0,np.max([np.max(sh_s_stab), np.max(sh_s_contr)]), label= " Ideal Min and max CG \n with a shifted wing (requires more iteration)", lw= 2, colors="gray" )
     plt.ylabel(r"$\frac{S_h}{S}$ [-]", fontsize= 16)
     plt.xlabel(r"$\frac{X_{cg}}{\overline{c}}$ [-]", fontsize= 16)
-    plt.legend()
+    plt.legend(fontsize= 9, loc= "lower left")
     plt.show()
 
 

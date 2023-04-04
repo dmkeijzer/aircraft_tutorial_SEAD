@@ -9,7 +9,7 @@ ct = 1.59
 c_mac = 2.11847
 b = 27.05
 b_half = b/2
-l_tot = 27.165
+l_f = 27.165
 MTOW = 23000
 sweep = 0
 
@@ -36,7 +36,7 @@ def cg_calculation(MTOW, x_lemac):
     cg_wh = 26.47
     cg_wv = 24.15
     cg_en = 11.32
-    cg_fus = 0.39 * l_tot
+    cg_fus = 0.39 * l_f
     cg_lm = 12.69
     cg_ln = 1.64
 
