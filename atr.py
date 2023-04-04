@@ -194,7 +194,7 @@ def scissor_plot(SM, max_cg, min_cg):
     plt.clf()
 
     xcg_bar = np.linspace(-1,1, 1000)
-    sh_s_range = np.linspace(0, 0.2, 1000)
+    sh_s_range = np.linspace(0, 0.4, 1000)
 
     #stability line creation
     a0 = 1/(CL_ah/CL_a_tailles*(1 - deda)*lh_c*vh_v**2)
@@ -223,13 +223,21 @@ def scissor_plot(SM, max_cg, min_cg):
     plt.fill_between(xcg_bar, sh_s_contr, color= 'red', alpha= 0.4)
 
     # Fitting cg range in plot
-    idx = np.isclose(x1, min_cg, atol=0.005)
-    sh_s = x1[idx]*a1 + b1
+    
+    idx1 = np.isclose(x1, min_cg, atol=0.01)
+    idx0 = np.isclose(x0, max_cg, atol=0.01)
+    if all(np.logical_not(idx1)) or all(np.logical_not(idx0)):
+        solution = False
+    else:
+        solution = True
+        sh_s = np.max([np.max(x1[idx1]*a1 + b1),np.max(x0[idx0]*a0 + b0)])
+
 
 
     plt.ylim([0, np.max([np.max(sh_s_stab), np.max(sh_s_contr)])])
     # plt.hlines(sh_s, min_cg, max_cg, colors= "k", lw=4,alpha=0.8, label= "Actual shift from loading diagram")
-    plt.hlines(sh_s, min_cg , max_cg, colors="fuchsia", lw = 2, label= "$S_h = $" + str(np.round(sh_s[0], 4)) + " tail sizing." + "\n" +  r"Actual $\frac{S_h}{S} = $" + str(np.round(s_h/s,4)) )
+    if solution:
+        plt.hlines(sh_s, min_cg , max_cg, colors="fuchsia", lw = 2, label= "$S_h = $" + str(np.round(sh_s, 4)) + " tail sizing." + "\n" +  r"Actual $\frac{S_h}{S} = $" + str(np.round(s_h/s,4)) )
     plt.vlines([min_cg, max_cg], 0,np.max([np.max(sh_s_stab), np.max(sh_s_contr)]), label= "Min and max CG", lw= 2, colors="darkorange" )
     plt.ylabel(r"$\frac{S_h}{S}$ [-]", fontsize= 16)
     plt.xlabel(r"$\frac{X_{cg}}{\overline{c}}$ [-]", fontsize= 16)
