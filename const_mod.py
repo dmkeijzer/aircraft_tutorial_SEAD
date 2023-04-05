@@ -9,7 +9,7 @@ import latexify
 # wing
 s = 61
 s_net = s - 7.55
-A = 12
+A = 12*1.2
 cr = 2.57
 ct = 1.59
 c_mac = 2.11847
