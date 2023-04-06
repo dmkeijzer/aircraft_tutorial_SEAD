@@ -186,7 +186,7 @@ def loading_diagrams(cg_OEW, OEW, PW, plot= True):
         plt.show()
     return max_cg, min_cg
 
-def scissor_plot(SM, max_cg, min_cg):
+def scissor_plot(SM, max_cg, min_cg, plot= True):
     """
     :param SM: stability margin
     :type SM: float
@@ -215,9 +215,9 @@ def scissor_plot(SM, max_cg, min_cg):
 
 
     # Plotting the actual scissor plot
-    plt.plot(xcg_bar, sh_s_stab, color= "k", lw= 2, label="Stability line")
-    plt.plot(xcg_bar, sh_s_NeutStab, "-", color= "b", lw= 2, label="Neutral Stability line")
-    plt.plot(xcg_bar, sh_s_contr, "-.", color= "k", lw= 2, label="Controllability line ")
+    stab_line = plt.plot(xcg_bar, sh_s_stab, color= "k", lw= 2, label="Stability line")[0]
+    neut_stab_line = plt.plot(xcg_bar, sh_s_NeutStab, "-", color= "b", lw= 2, label="Neutral Stability line")[0]
+    contr_line = plt.plot(xcg_bar, sh_s_contr, "-.", color= "k", lw= 2, label="Controllability line ")[0]
 
     plt.fill_between(xcg_bar, sh_s_NeutStab, color= 'red', alpha= 0.4)
     plt.fill_between(xcg_bar, sh_s_contr, color= 'red', alpha= 0.4)
@@ -242,13 +242,19 @@ def scissor_plot(SM, max_cg, min_cg):
     plt.ylabel(r"$\frac{S_h}{S}$ [-]", fontsize= 16)
     plt.xlabel(r"$\frac{X_{cg}}{\overline{c}}$ [-]", fontsize= 16)
     plt.legend()
-    plt.show()
+    if plot:
+        plt.show()
 
+    return stab_line, neut_stab_line, contr_line, sh_s
+
+cg_oew, cg_oew_lemac, OEW, PW= cg_calculation(MTOW, x_lemac)
+max_norm, min_norm = loading_diagrams(cg_oew, OEW, PW, plot= False)
+stab_norm, neutstab_norm, contr_norm, shs_norm= scissor_plot(0.05, max_norm, min_norm , plot= False)
 
 if __name__ == "__main__":
 
     cg_oew, cg_oew_lemac, OEW, PW= cg_calculation(MTOW, x_lemac)
     max, min = loading_diagrams(cg_oew, OEW, PW)
-    scissor_plot(0.05, max, min )
+    stab_norm, neutstab_norm, contr_norm = scissor_plot(0.05, max, min )
     plt.show()
 
